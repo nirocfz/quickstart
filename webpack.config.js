@@ -2,6 +2,7 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -13,7 +14,8 @@ module.exports = {
   entry: './src/static/js/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js'
+    filename: 'bundle.js',
+    chunkFilename: '[id].js'
   },
   module: {
     rules: [
@@ -28,19 +30,23 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          { loader: "style-loader" },
-          { loader: "css-loader" }
+          { loader: MiniCssExtractPlugin.loader },
+          // { loader: "style-loader" },
+          { loader: "css-loader", options: { importLoaders: 1 } },
+          { loader: 'postcss-loader' },
         ]
       },
       {
         test: /\.less$/,
         use: [
+          { loader: MiniCssExtractPlugin.loader },
           // creates style nodes from JS string
-          { loader: 'style-loader' },
+          // { loader: 'style-loader' },
           // translates CSS into CommonJS
-          { loader: 'css-loader' },
+          { loader: "css-loader", options: { importLoaders: 1 } },
+          { loader: 'postcss-loader' },
           // compiles Less to CSS
-          { loader: 'less-loader'}
+          { loader: 'less-loader'},
         ]
       },
       {
@@ -58,6 +64,12 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.WEBPACK_SERVE ? 'development' : 'production')
+    }),
+    new MiniCssExtractPlugin({
+      // Options similar to the same options in webpackOptions.output
+      // both options are optional
+      filename: 'bundle.css',
+      chunkFilename: '[id].css'
     })
   ]
 };
