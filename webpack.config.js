@@ -14,7 +14,8 @@ module.exports = {
   entry: './src/static/js/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
+    hashDigestLength: 7,
+    filename: 'bundle.[hash].js',
     chunkFilename: '[id].js'
   },
   module: {
@@ -30,7 +31,7 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          { loader: MiniCssExtractPlugin.loader },
+          { loader: process.env.WEBPACK_SERVE ? 'style-loader' : MiniCssExtractPlugin.loader },
           // { loader: "style-loader" },
           { loader: "css-loader", options: { importLoaders: 1 } },
           { loader: 'postcss-loader' },
@@ -39,7 +40,7 @@ module.exports = {
       {
         test: /\.less$/,
         use: [
-          { loader: MiniCssExtractPlugin.loader },
+          { loader: process.env.WEBPACK_SERVE ? 'style-loader' : MiniCssExtractPlugin.loader },
           // creates style nodes from JS string
           // { loader: 'style-loader' },
           // translates CSS into CommonJS
@@ -68,8 +69,9 @@ module.exports = {
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: 'bundle.css',
-      chunkFilename: '[id].css'
+      hashDigestLength: 7,
+      filename: 'bundle.[hash].css',
+      chunkFilename: '[id].[hash].css'
     })
   ]
 };
