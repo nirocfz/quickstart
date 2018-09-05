@@ -5,9 +5,13 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 module.exports = {
   mode: process.env.WEBPACK_SERVE ? 'development' : 'production',
+  externals: {
+    'jquery': '$'
+  },
   serve: {
     port: 36789
   },
@@ -55,12 +59,22 @@ module.exports = {
         use: [
           { loader: 'handlebars-loader' }
         ]
+      },
+      {
+        test: /\.(png|jpg|gif)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {}
+          }
+        ]
       }
     ]
   },
   plugins: [
-    new CleanWebpackPlugin(['dist']),
+    new CleanWebpackPlugin(['dist'], { exclude: ['images', 'favicon.ico'] }),
     new HtmlWebpackPlugin({
+      filename: 'index.html',
       template: './src/index.hbs',
     }),
     new webpack.DefinePlugin({
@@ -72,6 +86,7 @@ module.exports = {
       hashDigestLength: 7,
       filename: 'bundle.[hash].css',
       chunkFilename: '[id].[hash].css'
-    })
+    }),
+    new OptimizeCssAssetsPlugin({})
   ]
 };
